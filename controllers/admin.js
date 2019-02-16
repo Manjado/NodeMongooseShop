@@ -17,7 +17,8 @@ exports.postAddProduct = (req, res, next) => {
         title,
         price,
         description,
-        imageUrl
+        imageUrl,
+        userId: req.user
     });
     product
         .save() // this method is coming from mongoose
@@ -74,7 +75,10 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
     Product.find()
+        // .select('title price -_id')
+        // .populate('userId', 'name')
         .then(products => {
+            console.log(products)
             res.render('admin/products', {
                 prods: products,
                 pageTitle: 'Admin Products',
