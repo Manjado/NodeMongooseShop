@@ -6,15 +6,14 @@ console.log(req.session.isLoggedIn)
     res.render('auth/login', {
         path: '/login',
         pageTitle: 'Login',
-        isAuthenticated: req.session.isLoggedIn
+        errorMessage: req.flash('error') //in this case 'error' is key from 26 line
     });
 };
 
 exports.getSignup = (req, res, next) => {
     res.render('auth/signup', {
         path: '/signup',
-        pageTitle: 'Signup',
-        isAuthenticated: false
+        pageTitle: 'Signup'
     });
 };
 
@@ -24,11 +23,13 @@ exports.postLogin = (req, res, next) => {
     User.findOne({email:email})
         .then(user => {
             if(!user) {
+                req.flash('error', 'Invalid email or password.');
                 return res.redirect('/login')
             }
             bcrypt.compare(password, user.password)
                 .then(doMatch => {
-                    if(doMatch) {            req.session.isLoggedIn = true;
+                    if(doMatch) {
+                        req.session.isLoggedIn = true;
                         req.session.user = user;
                         return req.session.save(err => {
                             console.log(err);
