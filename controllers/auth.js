@@ -27,7 +27,7 @@ exports.getLogin = (req, res, next) => {
             email: '',
             password: ''
         },
-        validationError: []
+        validationErrors: []
     });
 };
 
