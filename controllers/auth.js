@@ -109,7 +109,11 @@ exports.postLogin = (req, res, next) => {
                     res.redirect('/login');
             });
         })
-        .catch(err=> console.log(err));
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
 exports.postSignup = (req, res, next) => {
@@ -143,19 +147,18 @@ exports.postSignup = (req, res, next) => {
         })
         .then(result => {
             res.redirect('/login');
-            return transporter.sendMail({
+/*            return transporter.sendMail({
                 to: email,
                 from: 'shop@node-complete.com',
                 subject: 'Signup succeeded!',
                 html: '<h1>You successfully signed up!</h1>'
-            });
+            });*/
         })
-        .catch(err => {
-            console.log(err);
-        })
-        .catch(err => {
-            console.log(err);
-        });
+         .catch(err => {
+             const error = new Error(err);
+             error.httpStatusCode = 500;
+             return next(error);
+         });
 };
 
 exports.postLogout = (req, res, next) => {
@@ -232,7 +235,11 @@ exports.getNewPassword = (req, res, next) => {
                 passwordToken: token
             });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 
 };
 
@@ -257,8 +264,12 @@ exports.postNewPassword = (req, res, next ) => {
         resetUser.resetTokenExpiration = undefined;
         return resetUser.save();
     })
-        .then(result => {
-            res.redirect('/login');
-        })
-    .catch(err => console.log(err))
-}
+    .then(result => {
+        res.redirect('/login');
+    })
+    .catch(err => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+    });
+};
