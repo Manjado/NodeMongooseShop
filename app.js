@@ -11,6 +11,7 @@ const multer = require('multer');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
+const uuidv4 = require('uuid/v4')
 
 const MONGODB_URI = 'mongodb+srv://Michael:b8sSmwk7I7wz7hpf@cluster0-flk3y.mongodb.net/shop';
 
@@ -21,6 +22,23 @@ const store = new MongoDBStore({
 });
 const csrfProtection = csrf();
 
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, uuidv4() + '-' + file.originalname)
+    }
+});
+
+const fileFilter = (req, file, cb)=> {
+    if(file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+};
+
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
@@ -29,7 +47,7 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({dest: 'images'}).single('image')) //'image' is  name of input - keep this rule
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image')) //'image' is  name of input - keep this rule
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({secret: 'my secret', resave: false, saveUninitialized: false, store: store}));
 app.use(csrfProtection);
