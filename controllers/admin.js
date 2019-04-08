@@ -32,7 +32,7 @@ exports.postAddProduct = (req, res, next) => {
                 description
             },
             errorMessage: 'Attached file is not an image.',
-            validationErrors: errors.array()
+            validationErrors: []
         });
     }
     if(!errors.isEmpty()) {
